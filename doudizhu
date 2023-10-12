@@ -1,0 +1,44 @@
+from tkinter import *
+import random
+import json
+
+# 网络斗地主游戏程序
+class DouDiZhuGame:
+    def __init__(self):
+        self.players = []  # 玩家列表，包含玩家姓名和手牌信息
+        self.cards = []  # 牌库，一副牌
+        self.bottom_cards = []  # 剩余的底牌
+        self.current_player = None  # 
+        self.score = {'player1': 0, 'player2': 0, 'player3': 0}  # 玩家得分
+        self.game_over = False  # 
+        self.initialize_cards()
+
+    def initialize_cards(self):
+        self.cards = [str(i) for i in range(1, 54)]  # 一副牌
+        self.bottom_cards = self.cards[:17]  # 底牌
+        self.cards = self.cards[17:]  # 剩余的牌
+
+    def add_player(self, player_info):
+        player_info = json.loads(player_info)
+        player_name = player_info['name']
+        hand = [card for card in self.cards if card in player_info['hand']]
+        self.players.append({
+            'name': player_name,
+            'hand': hand,
+            'score': 0,
+            'is_bot': player_info['is_bot'],
+            'is_winner': False,
+        })
+        if self.current_player is None:
+            self.current_player = player_info['name']
+        else:
+            self.current_player = self.players[0]['name']
+
+    def remove_card(self, player, card):
+      
+        player_info = next((p for p in self.players if p['name'] == player), None)
+        if player_info is not None:
+            player_info['hand'].remove(card)
+            if 'is_bot' in player_info:
+                if player_info['is_bot']:
+                    if 'bot' in player_info:
